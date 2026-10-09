@@ -1,0 +1,1091 @@
+
+mysql> -- =========================================================
+mysql> -- FOOD WASTE REDISTRIBUTION SYSTEM
+mysql> -- Complete Database + Tables + Sample Data
+mysql> -- =========================================================
+mysql>
+mysql> -- Create Database
+mysql> DROP DATABASE IF EXISTS food_waste_redistribution;
+Query OK, 0 rows affected, 1 warning (0.05 sec)
+
+mysql>
+mysql> CREATE DATABASE food_waste_redistribution;
+Query OK, 1 row affected (0.01 sec)
+
+mysql>
+mysql> USE food_waste_redistribution;
+Database changed
+mysql>
+mysql>
+mysql> -- =========================================================
+mysql> -- 1. DONORS TABLE
+mysql> -- =========================================================
+mysql>
+mysql> CREATE TABLE DONORS (
+    ->     donor_id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     donor_name VARCHAR(100) NOT NULL,
+    ->     phone VARCHAR(15),
+    ->     email VARCHAR(100),
+    ->     donor_type VARCHAR(50)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql>
+mysql> INSERT INTO DONORS
+    -> (donor_name, phone, email, donor_type)
+    -> VALUES
+    -> ('Fresh Bites Restaurant', '9876543210', 'freshbites@gmail.com', 'Restaurant'),
+    -> ('Green Leaf Hotel', '9876543211', 'greenleaf@gmail.com', 'Hotel'),
+    -> ('City Supermarket', '9876543212', 'citysupermarket@gmail.com', 'Supermarket'),
+    -> ('Food Care NGO', '9876543213', 'foodcare@gmail.com', 'NGO'),
+    -> ('Annapurna Catering', '9876543214', 'annapurna@gmail.com', 'Catering');
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql> -- =========================================================
+mysql> -- 2. COLLECTION_CENTERS TABLE
+mysql> -- =========================================================
+mysql>
+mysql> CREATE TABLE COLLECTION_CENTERS (
+    ->     center_id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     center_name VARCHAR(100) NOT NULL,
+    ->     location VARCHAR(150),
+    ->     capacity INT
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql>
+mysql> INSERT INTO COLLECTION_CENTERS
+    -> (center_name, location, capacity)
+    -> VALUES
+    -> ('Central Food Center', 'Visakhapatnam', 1000),
+    -> ('North Distribution Center', 'Vizianagaram', 800),
+    -> ('Community Food Hub', 'Gajuwaka', 600),
+    -> ('South Food Center', 'Anakapalle', 700);
+Query OK, 4 rows affected (0.01 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql> -- =========================================================
+mysql> -- 3. FOOD_ITEMS TABLE
+mysql> -- =========================================================
+mysql>
+mysql> CREATE TABLE FOOD_ITEMS (
+    ->     food_id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     food_name VARCHAR(100) NOT NULL,
+    ->     category VARCHAR(50),
+    ->     quantity INT,
+    ->     expiry_date DATE,
+    ->     food_status VARCHAR(30),
+    ->     center_id INT,
+    ->
+    ->     FOREIGN KEY (center_id)
+    ->         REFERENCES COLLECTION_CENTERS(center_id)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql>
+mysql> INSERT INTO FOOD_ITEMS
+    -> (food_name, category, quantity, expiry_date, food_status, center_id)
+    -> VALUES
+    -> ('Rice', 'Grains', 500, '2026-10-15', 'Available', 1),
+    -> ('Wheat', 'Grains', 300, '2026-11-10', 'Available', 1),
+    -> ('Vegetable Curry', 'Cooked Food', 150, '2026-10-02', 'Available', 2),
+    -> ('Bread', 'Bakery', 100, '2026-10-03', 'Available', 3),
+    -> ('Fruits', 'Fresh Food', 200, '2026-10-05', 'Available', 2),
+    -> ('Dal', 'Pulses', 250, '2026-12-01', 'Available', 4),
+    -> ('Milk', 'Dairy', 120, '2026-10-01', 'Available', 3),
+    -> ('Biscuits', 'Packaged Food', 180, '2027-01-15', 'Available', 4);
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql> -- =========================================================
+mysql> -- 4. DONATIONS TABLE
+mysql> -- =========================================================
+mysql>
+mysql> CREATE TABLE DONATIONS (
+    ->     donation_id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     donor_id INT NOT NULL,
+    ->     food_id INT NOT NULL,
+    ->     quantity_donated INT NOT NULL,
+    ->     donation_date DATE NOT NULL,
+    ->
+    ->     FOREIGN KEY (donor_id)
+    ->         REFERENCES DONORS(donor_id),
+    ->
+    ->     FOREIGN KEY (food_id)
+    ->         REFERENCES FOOD_ITEMS(food_id)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql>
+mysql> INSERT INTO DONATIONS
+    -> (donor_id, food_id, quantity_donated, donation_date)
+    -> VALUES
+    -> (1, 1, 200, '2026-09-20'),
+    -> (1, 3, 100, '2026-09-21'),
+    -> (2, 2, 150, '2026-09-21'),
+    -> (2, 5, 100, '2026-09-22'),
+    -> (3, 4, 80, '2026-09-23'),
+    -> (4, 6, 200, '2026-09-24'),
+    -> (5, 1, 300, '2026-09-25'),
+    -> (3, 8, 120, '2026-09-26');
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql> -- =========================================================
+mysql> -- 5. VOLUNTEERS TABLE
+mysql> -- =========================================================
+mysql>
+mysql> CREATE TABLE VOLUNTEERS (
+    ->     volunteer_id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     volunteer_name VARCHAR(100) NOT NULL,
+    ->     phone VARCHAR(15),
+    ->     center_id INT,
+    ->
+    ->     FOREIGN KEY (center_id)
+    ->         REFERENCES COLLECTION_CENTERS(center_id)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql>
+mysql> INSERT INTO VOLUNTEERS
+    -> (volunteer_name, phone, center_id)
+    -> VALUES
+    -> ('Rahul Kumar', '9000000001', 1),
+    -> ('Priya Sharma', '9000000002', 1),
+    -> ('Arjun Reddy', '9000000003', 1),
+    -> ('Sneha Rao', '9000000004', 2),
+    -> ('Kiran Kumar', '9000000005', 2),
+    -> ('Anjali Devi', '9000000006', 3),
+    -> ('Ravi Teja', '9000000007', 4),
+    -> ('Meena Kumari', '9000000008', 4);
+Query OK, 8 rows affected (0.01 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql> -- =========================================================
+mysql> -- 6. RECIPIENTS TABLE
+mysql> -- =========================================================
+mysql>
+mysql> CREATE TABLE RECIPIENTS (
+    ->     recipient_id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     recipient_name VARCHAR(100) NOT NULL,
+    ->     recipient_type VARCHAR(50),
+    ->     phone VARCHAR(15),
+    ->     address VARCHAR(200)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql>
+mysql> INSERT INTO RECIPIENTS
+    -> (recipient_name, recipient_type, phone, address)
+    -> VALUES
+    -> ('Helping Hands Orphanage', 'Orphanage', '9100000001', 'Visakhapatnam'),
+    -> ('Hope Old Age Home', 'Old Age Home', '9100000002', 'Vizianagaram'),
+    -> ('Community Shelter', 'Shelter', '9100000003', 'Gajuwaka'),
+    -> ('Care Children Center', 'Children Home', '9100000004', 'Anakapalle'),
+    -> ('Poor Families Association', 'Community', '9100000005', 'Visakhapatnam');
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql> -- =========================================================
+mysql> -- 7. DISTRIBUTIONS TABLE
+mysql> -- =========================================================
+mysql>
+mysql> CREATE TABLE DISTRIBUTIONS (
+    ->     distribution_id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     recipient_id INT NOT NULL,
+    ->     center_id INT NOT NULL,
+    ->     distribution_date DATE NOT NULL,
+    ->     status VARCHAR(30),
+    ->
+    ->     FOREIGN KEY (recipient_id)
+    ->         REFERENCES RECIPIENTS(recipient_id),
+    ->
+    ->     FOREIGN KEY (center_id)
+    ->         REFERENCES COLLECTION_CENTERS(center_id)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql>
+mysql> INSERT INTO DISTRIBUTIONS
+    -> (recipient_id, center_id, distribution_date, status)
+    -> VALUES
+    -> (1, 1, '2026-09-25', 'Completed'),
+    -> (2, 2, '2026-09-26', 'Completed'),
+    -> (3, 3, '2026-09-27', 'Completed'),
+    -> (4, 4, '2026-09-28', 'Completed'),
+    -> (5, 1, '2026-09-29', 'Completed');
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql> -- =========================================================
+mysql> -- 8. DISTRIBUTION_DETAILS TABLE
+mysql> -- =========================================================
+mysql>
+mysql> CREATE TABLE DISTRIBUTION_DETAILS (
+    ->     detail_id INT PRIMARY KEY AUTO_INCREMENT,
+    ->     distribution_id INT NOT NULL,
+    ->     food_id INT NOT NULL,
+    ->     quantity_distributed INT NOT NULL,
+    ->
+    ->     FOREIGN KEY (distribution_id)
+    ->         REFERENCES DISTRIBUTIONS(distribution_id),
+    ->
+    ->     FOREIGN KEY (food_id)
+    ->         REFERENCES FOOD_ITEMS(food_id)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql>
+mysql> INSERT INTO DISTRIBUTION_DETAILS
+    -> (distribution_id, food_id, quantity_distributed)
+    -> VALUES
+    -> (1, 1, 50),
+    -> (1, 3, 20),
+    -> (2, 2, 40),
+    -> (2, 5, 30),
+    -> (3, 4, 25),
+    -> (3, 8, 20),
+    -> (4, 6, 50),
+    -> (4, 1, 40),
+    -> (5, 1, 60),
+    -> (5, 5, 25);
+Query OK, 10 rows affected (0.01 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql> -- =========================================================
+mysql> -- CHECK ALL TABLES
+mysql> -- =========================================================
+mysql>
+mysql> SHOW TABLES;
++-------------------------------------+
+| Tables_in_food_waste_redistribution |
++-------------------------------------+
+| collection_centers                  |
+| distribution_details                |
+| distributions                       |
+| donations                           |
+| donors                              |
+| food_items                          |
+| recipients                          |
+| volunteers                          |
++-------------------------------------+
+8 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- =========================================================
+mysql> -- DISPLAY ALL TABLE DATA
+mysql> -- =========================================================
+mysql>
+mysql> SELECT * FROM DONORS;
++----------+------------------------+------------+---------------------------+-------------+
+| donor_id | donor_name             | phone      | email                     | donor_type  |
++----------+------------------------+------------+---------------------------+-------------+
+|        1 | Fresh Bites Restaurant | 9876543210 | freshbites@gmail.com      | Restaurant  |
+|        2 | Green Leaf Hotel       | 9876543211 | greenleaf@gmail.com       | Hotel       |
+|        3 | City Supermarket       | 9876543212 | citysupermarket@gmail.com | Supermarket |
+|        4 | Food Care NGO          | 9876543213 | foodcare@gmail.com        | NGO         |
+|        5 | Annapurna Catering     | 9876543214 | annapurna@gmail.com       | Catering    |
++----------+------------------------+------------+---------------------------+-------------+
+5 rows in set (0.00 sec)
+
+mysql>
+mysql> SELECT * FROM COLLECTION_CENTERS;
++-----------+---------------------------+---------------+----------+
+| center_id | center_name               | location      | capacity |
++-----------+---------------------------+---------------+----------+
+|         1 | Central Food Center       | Visakhapatnam |     1000 |
+|         2 | North Distribution Center | Vizianagaram  |      800 |
+|         3 | Community Food Hub        | Gajuwaka      |      600 |
+|         4 | South Food Center         | Anakapalle    |      700 |
++-----------+---------------------------+---------------+----------+
+4 rows in set (0.00 sec)
+
+mysql>
+mysql> SELECT * FROM FOOD_ITEMS;
++---------+-----------------+---------------+----------+-------------+-------------+-----------+
+| food_id | food_name       | category      | quantity | expiry_date | food_status | center_id |
++---------+-----------------+---------------+----------+-------------+-------------+-----------+
+|       1 | Rice            | Grains        |      500 | 2026-10-15  | Available   |         1 |
+|       2 | Wheat           | Grains        |      300 | 2026-11-10  | Available   |         1 |
+|       3 | Vegetable Curry | Cooked Food   |      150 | 2026-10-02  | Available   |         2 |
+|       4 | Bread           | Bakery        |      100 | 2026-10-03  | Available   |         3 |
+|       5 | Fruits          | Fresh Food    |      200 | 2026-10-05  | Available   |         2 |
+|       6 | Dal             | Pulses        |      250 | 2026-12-01  | Available   |         4 |
+|       7 | Milk            | Dairy         |      120 | 2026-10-01  | Available   |         3 |
+|       8 | Biscuits        | Packaged Food |      180 | 2027-01-15  | Available   |         4 |
++---------+-----------------+---------------+----------+-------------+-------------+-----------+
+8 rows in set (0.00 sec)
+
+mysql>
+mysql> SELECT * FROM DONATIONS;
++-------------+----------+---------+------------------+---------------+
+| donation_id | donor_id | food_id | quantity_donated | donation_date |
++-------------+----------+---------+------------------+---------------+
+|           1 |        1 |       1 |              200 | 2026-09-20    |
+|           2 |        1 |       3 |              100 | 2026-09-21    |
+|           3 |        2 |       2 |              150 | 2026-09-21    |
+|           4 |        2 |       5 |              100 | 2026-09-22    |
+|           5 |        3 |       4 |               80 | 2026-09-23    |
+|           6 |        4 |       6 |              200 | 2026-09-24    |
+|           7 |        5 |       1 |              300 | 2026-09-25    |
+|           8 |        3 |       8 |              120 | 2026-09-26    |
++-------------+----------+---------+------------------+---------------+
+8 rows in set (0.00 sec)
+
+mysql>
+mysql> SELECT * FROM VOLUNTEERS;
++--------------+----------------+------------+-----------+
+| volunteer_id | volunteer_name | phone      | center_id |
++--------------+----------------+------------+-----------+
+|            1 | Rahul Kumar    | 9000000001 |         1 |
+|            2 | Priya Sharma   | 9000000002 |         1 |
+|            3 | Arjun Reddy    | 9000000003 |         1 |
+|            4 | Sneha Rao      | 9000000004 |         2 |
+|            5 | Kiran Kumar    | 9000000005 |         2 |
+|            6 | Anjali Devi    | 9000000006 |         3 |
+|            7 | Ravi Teja      | 9000000007 |         4 |
+|            8 | Meena Kumari   | 9000000008 |         4 |
++--------------+----------------+------------+-----------+
+8 rows in set (0.00 sec)
+
+mysql>
+mysql> SELECT * FROM RECIPIENTS;
++--------------+---------------------------+----------------+------------+---------------+
+| recipient_id | recipient_name            | recipient_type | phone      | address       |
++--------------+---------------------------+----------------+------------+---------------+
+|            1 | Helping Hands Orphanage   | Orphanage      | 9100000001 | Visakhapatnam |
+|            2 | Hope Old Age Home         | Old Age Home   | 9100000002 | Vizianagaram  |
+|            3 | Community Shelter         | Shelter        | 9100000003 | Gajuwaka      |
+|            4 | Care Children Center      | Children Home  | 9100000004 | Anakapalle    |
+|            5 | Poor Families Association | Community      | 9100000005 | Visakhapatnam |
++--------------+---------------------------+----------------+------------+---------------+
+5 rows in set (0.00 sec)
+
+mysql>
+mysql> SELECT * FROM DISTRIBUTIONS;
++-----------------+--------------+-----------+-------------------+-----------+
+| distribution_id | recipient_id | center_id | distribution_date | status    |
++-----------------+--------------+-----------+-------------------+-----------+
+|               1 |            1 |         1 | 2026-09-25        | Completed |
+|               2 |            2 |         2 | 2026-09-26        | Completed |
+|               3 |            3 |         3 | 2026-09-27        | Completed |
+|               4 |            4 |         4 | 2026-09-28        | Completed |
+|               5 |            5 |         1 | 2026-09-29        | Completed |
++-----------------+--------------+-----------+-------------------+-----------+
+5 rows in set (0.00 sec)
+
+mysql>
+mysql> SELECT * FROM DISTRIBUTION_DETAILS;
++-----------+-----------------+---------+----------------------+
+| detail_id | distribution_id | food_id | quantity_distributed |
++-----------+-----------------+---------+----------------------+
+|         1 |               1 |       1 |                   50 |
+|         2 |               1 |       3 |                   20 |
+|         3 |               2 |       2 |                   40 |
+|         4 |               2 |       5 |                   30 |
+|         5 |               3 |       4 |                   25 |
+|         6 |               3 |       8 |                   20 |
+|         7 |               4 |       6 |                   50 |
+|         8 |               4 |       1 |                   40 |
+|         9 |               5 |       1 |                   60 |
+|        10 |               5 |       5 |                   25 |
++-----------+-----------------+---------+----------------------+
+10 rows in set (0.00 sec)
+
+mysql> USE food_waste_redistribution;
+Database changed
+mysql>
+mysql> -- =========================================================
+mysql> -- FOOD WASTE REDISTRIBUTION SYSTEM
+mysql> -- 30 SQL QUERIES
+mysql> -- =========================================================
+mysql>
+mysql>
+mysql> -- 1. Display all donors
+mysql>
+mysql> SELECT *
+    -> FROM DONORS;
++----------+------------------------+------------+---------------------------+-------------+
+| donor_id | donor_name             | phone      | email                     | donor_type  |
++----------+------------------------+------------+---------------------------+-------------+
+|        1 | Fresh Bites Restaurant | 9876543210 | freshbites@gmail.com      | Restaurant  |
+|        2 | Green Leaf Hotel       | 9876543211 | greenleaf@gmail.com       | Hotel       |
+|        3 | City Supermarket       | 9876543212 | citysupermarket@gmail.com | Supermarket |
+|        4 | Food Care NGO          | 9876543213 | foodcare@gmail.com        | NGO         |
+|        5 | Annapurna Catering     | 9876543214 | annapurna@gmail.com       | Catering    |
++----------+------------------------+------------+---------------------------+-------------+
+5 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 2. Display all food items
+mysql>
+mysql> SELECT *
+    -> FROM FOOD_ITEMS;
++---------+-----------------+---------------+----------+-------------+-------------+-----------+
+| food_id | food_name       | category      | quantity | expiry_date | food_status | center_id |
++---------+-----------------+---------------+----------+-------------+-------------+-----------+
+|       1 | Rice            | Grains        |      500 | 2026-10-15  | Available   |         1 |
+|       2 | Wheat           | Grains        |      300 | 2026-11-10  | Available   |         1 |
+|       3 | Vegetable Curry | Cooked Food   |      150 | 2026-10-02  | Available   |         2 |
+|       4 | Bread           | Bakery        |      100 | 2026-10-03  | Available   |         3 |
+|       5 | Fruits          | Fresh Food    |      200 | 2026-10-05  | Available   |         2 |
+|       6 | Dal             | Pulses        |      250 | 2026-12-01  | Available   |         4 |
+|       7 | Milk            | Dairy         |      120 | 2026-10-01  | Available   |         3 |
+|       8 | Biscuits        | Packaged Food |      180 | 2027-01-15  | Available   |         4 |
++---------+-----------------+---------------+----------+-------------+-------------+-----------+
+8 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 3. Display all recipients
+mysql>
+mysql> SELECT *
+    -> FROM RECIPIENTS;
++--------------+---------------------------+----------------+------------+---------------+
+| recipient_id | recipient_name            | recipient_type | phone      | address       |
++--------------+---------------------------+----------------+------------+---------------+
+|            1 | Helping Hands Orphanage   | Orphanage      | 9100000001 | Visakhapatnam |
+|            2 | Hope Old Age Home         | Old Age Home   | 9100000002 | Vizianagaram  |
+|            3 | Community Shelter         | Shelter        | 9100000003 | Gajuwaka      |
+|            4 | Care Children Center      | Children Home  | 9100000004 | Anakapalle    |
+|            5 | Poor Families Association | Community      | 9100000005 | Visakhapatnam |
++--------------+---------------------------+----------------+------------+---------------+
+5 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 4. Display all collection centers
+mysql>
+mysql> SELECT *
+    -> FROM COLLECTION_CENTERS;
++-----------+---------------------------+---------------+----------+
+| center_id | center_name               | location      | capacity |
++-----------+---------------------------+---------------+----------+
+|         1 | Central Food Center       | Visakhapatnam |     1000 |
+|         2 | North Distribution Center | Vizianagaram  |      800 |
+|         3 | Community Food Hub        | Gajuwaka      |      600 |
+|         4 | South Food Center         | Anakapalle    |      700 |
++-----------+---------------------------+---------------+----------+
+4 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 5. Display food items that are currently available
+mysql>
+mysql> SELECT food_id, food_name, category, quantity
+    -> FROM FOOD_ITEMS
+    -> WHERE food_status = 'Available';
++---------+-----------------+---------------+----------+
+| food_id | food_name       | category      | quantity |
++---------+-----------------+---------------+----------+
+|       1 | Rice            | Grains        |      500 |
+|       2 | Wheat           | Grains        |      300 |
+|       3 | Vegetable Curry | Cooked Food   |      150 |
+|       4 | Bread           | Bakery        |      100 |
+|       5 | Fruits          | Fresh Food    |      200 |
+|       6 | Dal             | Pulses        |      250 |
+|       7 | Milk            | Dairy         |      120 |
+|       8 | Biscuits        | Packaged Food |      180 |
++---------+-----------------+---------------+----------+
+8 rows in set (0.01 sec)
+
+mysql>
+mysql>
+mysql> -- 6. Find food items with quantity greater than 100
+mysql>
+mysql> SELECT food_name, quantity
+    -> FROM FOOD_ITEMS
+    -> WHERE quantity > 100;
++-----------------+----------+
+| food_name       | quantity |
++-----------------+----------+
+| Rice            |      500 |
+| Wheat           |      300 |
+| Vegetable Curry |      150 |
+| Fruits          |      200 |
+| Dal             |      250 |
+| Milk            |      120 |
+| Biscuits        |      180 |
++-----------------+----------+
+7 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 7. Display donors of a particular type
+mysql>
+mysql> SELECT donor_id, donor_name, donor_type
+    -> FROM DONORS
+    -> WHERE donor_type = 'Restaurant';
++----------+------------------------+------------+
+| donor_id | donor_name             | donor_type |
++----------+------------------------+------------+
+|        1 | Fresh Bites Restaurant | Restaurant |
++----------+------------------------+------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 8. Find the total quantity of food donated
+mysql>
+mysql> SELECT SUM(quantity_donated) AS total_food_donated
+    -> FROM DONATIONS;
++--------------------+
+| total_food_donated |
++--------------------+
+|               1250 |
++--------------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 9. Find the average donation quantity
+mysql>
+mysql> SELECT AVG(quantity_donated) AS average_donation
+    -> FROM DONATIONS;
++------------------+
+| average_donation |
++------------------+
+|         156.2500 |
++------------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 10. Find the maximum donation quantity
+mysql>
+mysql> SELECT MAX(quantity_donated) AS maximum_donation
+    -> FROM DONATIONS;
++------------------+
+| maximum_donation |
++------------------+
+|              300 |
++------------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 11. Find the minimum donation quantity
+mysql>
+mysql> SELECT MIN(quantity_donated) AS minimum_donation
+    -> FROM DONATIONS;
++------------------+
+| minimum_donation |
++------------------+
+|               80 |
++------------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 12. Count the total number of donors
+mysql>
+mysql> SELECT COUNT(*) AS total_donors
+    -> FROM DONORS;
++--------------+
+| total_donors |
++--------------+
+|            5 |
++--------------+
+1 row in set (0.01 sec)
+
+mysql>
+mysql>
+mysql> -- 13. Count the total number of recipients
+mysql>
+mysql> SELECT COUNT(*) AS total_recipients
+    -> FROM RECIPIENTS;
++------------------+
+| total_recipients |
++------------------+
+|                5 |
++------------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 14. Display donors and their donations
+mysql>
+mysql> SELECT d.donor_name,
+    ->        dn.donation_id,
+    ->        dn.quantity_donated,
+    ->        dn.donation_date
+    -> FROM DONORS d
+    -> JOIN DONATIONS dn
+    -> ON d.donor_id = dn.donor_id;
++------------------------+-------------+------------------+---------------+
+| donor_name             | donation_id | quantity_donated | donation_date |
++------------------------+-------------+------------------+---------------+
+| Fresh Bites Restaurant |           1 |              200 | 2026-09-20    |
+| Fresh Bites Restaurant |           2 |              100 | 2026-09-21    |
+| Green Leaf Hotel       |           3 |              150 | 2026-09-21    |
+| Green Leaf Hotel       |           4 |              100 | 2026-09-22    |
+| City Supermarket       |           5 |               80 | 2026-09-23    |
+| City Supermarket       |           8 |              120 | 2026-09-26    |
+| Food Care NGO          |           6 |              200 | 2026-09-24    |
+| Annapurna Catering     |           7 |              300 | 2026-09-25    |
++------------------------+-------------+------------------+---------------+
+8 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 15. Display food items and their donation quantities
+mysql>
+mysql> SELECT f.food_name,
+    ->        dn.quantity_donated,
+    ->        dn.donation_date
+    -> FROM FOOD_ITEMS f
+    -> JOIN DONATIONS dn
+    -> ON f.food_id = dn.food_id;
++-----------------+------------------+---------------+
+| food_name       | quantity_donated | donation_date |
++-----------------+------------------+---------------+
+| Rice            |              200 | 2026-09-20    |
+| Rice            |              300 | 2026-09-25    |
+| Wheat           |              150 | 2026-09-21    |
+| Vegetable Curry |              100 | 2026-09-21    |
+| Bread           |               80 | 2026-09-23    |
+| Fruits          |              100 | 2026-09-22    |
+| Dal             |              200 | 2026-09-24    |
+| Biscuits        |              120 | 2026-09-26    |
++-----------------+------------------+---------------+
+8 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 16. Find total food donated by each donor
+mysql>
+mysql> SELECT d.donor_name,
+    ->        SUM(dn.quantity_donated) AS total_donated
+    -> FROM DONORS d
+    -> JOIN DONATIONS dn
+    -> ON d.donor_id = dn.donor_id
+    -> GROUP BY d.donor_name;
++------------------------+---------------+
+| donor_name             | total_donated |
++------------------------+---------------+
+| Fresh Bites Restaurant |           300 |
+| Green Leaf Hotel       |           250 |
+| City Supermarket       |           200 |
+| Food Care NGO          |           200 |
+| Annapurna Catering     |           300 |
++------------------------+---------------+
+5 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 17. Find total quantity donated for each food item
+mysql>
+mysql> SELECT f.food_name,
+    ->        SUM(dn.quantity_donated) AS total_quantity
+    -> FROM FOOD_ITEMS f
+    -> JOIN DONATIONS dn
+    -> ON f.food_id = dn.food_id
+    -> GROUP BY f.food_name;
++-----------------+----------------+
+| food_name       | total_quantity |
++-----------------+----------------+
+| Rice            |            500 |
+| Wheat           |            150 |
+| Vegetable Curry |            100 |
+| Bread           |             80 |
+| Fruits          |            100 |
+| Dal             |            200 |
+| Biscuits        |            120 |
++-----------------+----------------+
+7 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 18. Display recipients and their distribution records
+mysql>
+mysql> SELECT r.recipient_name,
+    ->        ds.distribution_id,
+    ->        ds.distribution_date,
+    ->        ds.status
+    -> FROM RECIPIENTS r
+    -> JOIN DISTRIBUTIONS ds
+    -> ON r.recipient_id = ds.recipient_id;
++---------------------------+-----------------+-------------------+-----------+
+| recipient_name            | distribution_id | distribution_date | status    |
++---------------------------+-----------------+-------------------+-----------+
+| Helping Hands Orphanage   |               1 | 2026-09-25        | Completed |
+| Hope Old Age Home         |               2 | 2026-09-26        | Completed |
+| Community Shelter         |               3 | 2026-09-27        | Completed |
+| Care Children Center      |               4 | 2026-09-28        | Completed |
+| Poor Families Association |               5 | 2026-09-29        | Completed |
++---------------------------+-----------------+-------------------+-----------+
+5 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 19. Display distribution details with food names
+mysql>
+mysql> SELECT dd.detail_id,
+    ->        f.food_name,
+    ->        dd.quantity_distributed
+    -> FROM DISTRIBUTION_DETAILS dd
+    -> JOIN FOOD_ITEMS f
+    -> ON dd.food_id = f.food_id;
++-----------+-----------------+----------------------+
+| detail_id | food_name       | quantity_distributed |
++-----------+-----------------+----------------------+
+|         1 | Rice            |                   50 |
+|         8 | Rice            |                   40 |
+|         9 | Rice            |                   60 |
+|         3 | Wheat           |                   40 |
+|         2 | Vegetable Curry |                   20 |
+|         5 | Bread           |                   25 |
+|         4 | Fruits          |                   30 |
+|        10 | Fruits          |                   25 |
+|         7 | Dal             |                   50 |
+|         6 | Biscuits        |                   20 |
++-----------+-----------------+----------------------+
+10 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 20. Find total food distributed
+mysql>
+mysql> SELECT SUM(quantity_distributed) AS total_food_distributed
+    -> FROM DISTRIBUTION_DETAILS;
++------------------------+
+| total_food_distributed |
++------------------------+
+|                    360 |
++------------------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 21. Find total food distributed for each food item
+mysql>
+mysql> SELECT f.food_name,
+    ->        SUM(dd.quantity_distributed) AS total_distributed
+    -> FROM FOOD_ITEMS f
+    -> JOIN DISTRIBUTION_DETAILS dd
+    -> ON f.food_id = dd.food_id
+    -> GROUP BY f.food_name;
++-----------------+-------------------+
+| food_name       | total_distributed |
++-----------------+-------------------+
+| Rice            |               150 |
+| Wheat           |                40 |
+| Vegetable Curry |                20 |
+| Bread           |                25 |
+| Fruits          |                55 |
+| Dal             |                50 |
+| Biscuits        |                20 |
++-----------------+-------------------+
+7 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 22. Find the number of volunteers in each collection center
+mysql>
+mysql> SELECT c.center_name,
+    ->        COUNT(v.volunteer_id) AS total_volunteers
+    -> FROM COLLECTION_CENTERS c
+    -> LEFT JOIN VOLUNTEERS v
+    -> ON c.center_id = v.center_id
+    -> GROUP BY c.center_name;
++---------------------------+------------------+
+| center_name               | total_volunteers |
++---------------------------+------------------+
+| Central Food Center       |                3 |
+| North Distribution Center |                2 |
+| Community Food Hub        |                1 |
+| South Food Center         |                2 |
++---------------------------+------------------+
+4 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 23. Display volunteers and their collection centers
+mysql>
+mysql> SELECT v.volunteer_name,
+    ->        v.phone,
+    ->        c.center_name,
+    ->        c.location
+    -> FROM VOLUNTEERS v
+    -> JOIN COLLECTION_CENTERS c
+    -> ON v.center_id = c.center_id;
++----------------+------------+---------------------------+---------------+
+| volunteer_name | phone      | center_name               | location      |
++----------------+------------+---------------------------+---------------+
+| Rahul Kumar    | 9000000001 | Central Food Center       | Visakhapatnam |
+| Priya Sharma   | 9000000002 | Central Food Center       | Visakhapatnam |
+| Arjun Reddy    | 9000000003 | Central Food Center       | Visakhapatnam |
+| Sneha Rao      | 9000000004 | North Distribution Center | Vizianagaram  |
+| Kiran Kumar    | 9000000005 | North Distribution Center | Vizianagaram  |
+| Anjali Devi    | 9000000006 | Community Food Hub        | Gajuwaka      |
+| Ravi Teja      | 9000000007 | South Food Center         | Anakapalle    |
+| Meena Kumari   | 9000000008 | South Food Center         | Anakapalle    |
++----------------+------------+---------------------------+---------------+
+8 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 24. Find centers that have more than 5 volunteers
+mysql>
+mysql> SELECT c.center_name,
+    ->        COUNT(v.volunteer_id) AS total_volunteers
+    -> FROM COLLECTION_CENTERS c
+    -> JOIN VOLUNTEERS v
+    -> ON c.center_id = v.center_id
+    -> GROUP BY c.center_name
+    -> HAVING COUNT(v.volunteer_id) > 5;
+Empty set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 25. Find donors who donated more than the average donation quantity
+mysql>
+mysql> SELECT donor_id,
+    ->        donation_id,
+    ->        quantity_donated
+    -> FROM DONATIONS
+    -> WHERE quantity_donated >
+    ->       (
+    ->           SELECT AVG(quantity_donated)
+    ->           FROM DONATIONS
+    ->       );
++----------+-------------+------------------+
+| donor_id | donation_id | quantity_donated |
++----------+-------------+------------------+
+|        1 |           1 |              200 |
+|        4 |           6 |              200 |
+|        5 |           7 |              300 |
++----------+-------------+------------------+
+3 rows in set (0.04 sec)
+
+mysql>
+mysql>
+mysql> -- 26. Find the food item with the highest donated quantity
+mysql>
+mysql> SELECT f.food_name,
+    ->        SUM(dn.quantity_donated) AS total_donated
+    -> FROM FOOD_ITEMS f
+    -> JOIN DONATIONS dn
+    -> ON f.food_id = dn.food_id
+    -> GROUP BY f.food_name
+    -> ORDER BY total_donated DESC
+    -> LIMIT 1;
++-----------+---------------+
+| food_name | total_donated |
++-----------+---------------+
+| Rice      |           500 |
++-----------+---------------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 27. Find recipients who received more than 50 units of food
+mysql>
+mysql> SELECT r.recipient_name,
+    ->        SUM(dd.quantity_distributed) AS total_received
+    -> FROM RECIPIENTS r
+    -> JOIN DISTRIBUTIONS ds
+    -> ON r.recipient_id = ds.recipient_id
+    -> JOIN DISTRIBUTION_DETAILS dd
+    -> ON ds.distribution_id = dd.distribution_id
+    -> GROUP BY r.recipient_name
+    -> HAVING SUM(dd.quantity_distributed) > 50;
++---------------------------+----------------+
+| recipient_name            | total_received |
++---------------------------+----------------+
+| Helping Hands Orphanage   |             70 |
+| Hope Old Age Home         |             70 |
+| Care Children Center      |             90 |
+| Poor Families Association |             85 |
++---------------------------+----------------+
+4 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 28. Display complete food distribution information
+mysql>
+mysql> SELECT r.recipient_name,
+    ->        c.center_name,
+    ->        f.food_name,
+    ->        dd.quantity_distributed,
+    ->        ds.distribution_date
+    -> FROM RECIPIENTS r
+    -> JOIN DISTRIBUTIONS ds
+    -> ON r.recipient_id = ds.recipient_id
+    -> JOIN COLLECTION_CENTERS c
+    -> ON ds.center_id = c.center_id
+    -> JOIN DISTRIBUTION_DETAILS dd
+    -> ON ds.distribution_id = dd.distribution_id
+    -> JOIN FOOD_ITEMS f
+    -> ON dd.food_id = f.food_id;
++---------------------------+---------------------------+-----------------+----------------------+-------------------+
+| recipient_name            | center_name               | food_name       | quantity_distributed | distribution_date |
++---------------------------+---------------------------+-----------------+----------------------+-------------------+
+| Helping Hands Orphanage   | Central Food Center       | Rice            |                   50 | 2026-09-25        |
+| Helping Hands Orphanage   | Central Food Center       | Vegetable Curry |                   20 | 2026-09-25        |
+| Poor Families Association | Central Food Center       | Rice            |                   60 | 2026-09-29        |
+| Poor Families Association | Central Food Center       | Fruits          |                   25 | 2026-09-29        |
+| Hope Old Age Home         | North Distribution Center | Wheat           |                   40 | 2026-09-26        |
+| Hope Old Age Home         | North Distribution Center | Fruits          |                   30 | 2026-09-26        |
+| Community Shelter         | Community Food Hub        | Bread           |                   25 | 2026-09-27        |
+| Community Shelter         | Community Food Hub        | Biscuits        |                   20 | 2026-09-27        |
+| Care Children Center      | South Food Center         | Dal             |                   50 | 2026-09-28        |
+| Care Children Center      | South Food Center         | Rice            |                   40 | 2026-09-28        |
++---------------------------+---------------------------+-----------------+----------------------+-------------------+
+10 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 29. Create a view for food distribution summary
+mysql>
+mysql> CREATE VIEW food_distribution_summary AS
+    -> SELECT r.recipient_name,
+    ->        f.food_name,
+    ->        dd.quantity_distributed,
+    ->        ds.distribution_date,
+    ->        c.center_name
+    -> FROM RECIPIENTS r
+    -> JOIN DISTRIBUTIONS ds
+    -> ON r.recipient_id = ds.recipient_id
+    -> JOIN COLLECTION_CENTERS c
+    -> ON ds.center_id = c.center_id
+    -> JOIN DISTRIBUTION_DETAILS dd
+    -> ON ds.distribution_id = dd.distribution_id
+    -> JOIN FOOD_ITEMS f
+    -> ON dd.food_id = f.food_id;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>
+mysql>
+mysql> -- Display the view
+mysql>
+mysql> SELECT *
+    -> FROM food_distribution_summary;
++---------------------------+-----------------+----------------------+-------------------+---------------------------+
+| recipient_name            | food_name       | quantity_distributed | distribution_date | center_name               |
++---------------------------+-----------------+----------------------+-------------------+---------------------------+
+| Helping Hands Orphanage   | Rice            |                   50 | 2026-09-25        | Central Food Center       |
+| Helping Hands Orphanage   | Vegetable Curry |                   20 | 2026-09-25        | Central Food Center       |
+| Poor Families Association | Rice            |                   60 | 2026-09-29        | Central Food Center       |
+| Poor Families Association | Fruits          |                   25 | 2026-09-29        | Central Food Center       |
+| Hope Old Age Home         | Wheat           |                   40 | 2026-09-26        | North Distribution Center |
+| Hope Old Age Home         | Fruits          |                   30 | 2026-09-26        | North Distribution Center |
+| Community Shelter         | Bread           |                   25 | 2026-09-27        | Community Food Hub        |
+| Community Shelter         | Biscuits        |                   20 | 2026-09-27        | Community Food Hub        |
+| Care Children Center      | Dal             |                   50 | 2026-09-28        | South Food Center         |
+| Care Children Center      | Rice            |                   40 | 2026-09-28        | South Food Center         |
++---------------------------+-----------------+----------------------+-------------------+---------------------------+
+10 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- 30. Find food items that have not been distributed
+mysql>
+mysql> SELECT food_id,
+    ->        food_name
+    -> FROM FOOD_ITEMS
+    -> WHERE food_id NOT IN
+    -> (
+    ->     SELECT food_id
+    ->     FROM DISTRIBUTION_DETAILS
+    -> );
++---------+-----------+
+| food_id | food_name |
++---------+-----------+
+|       7 | Milk      |
++---------+-----------+
+1 row in set (0.04 sec)
+
+mysql>
+
+mysql> -- =========================================================
+mysql> -- STORED PROCEDURES
+mysql> -- =========================================================
+mysql>
+mysql> -- 31. Procedure to display available food
+mysql>
+mysql> DELIMITER //
+mysql>
+mysql> CREATE PROCEDURE GetAvailableFood()
+    -> BEGIN
+    ->     SELECT food_id,
+    ->            food_name,
+    ->            category,
+    ->            quantity,
+    ->            expiry_date
+    ->     FROM FOOD_ITEMS
+    ->     WHERE food_status = 'Available';
+    -> END //
+Query OK, 0 rows affected (0.02 sec)
+
+mysql>
+mysql> DELIMITER ;
+mysql>
+mysql> CALL GetAvailableFood();
++---------+-----------------+---------------+----------+-------------+
+| food_id | food_name       | category      | quantity | expiry_date |
++---------+-----------------+---------------+----------+-------------+
+|       1 | Rice            | Grains        |      500 | 2026-10-15  |
+|       2 | Wheat           | Grains        |      300 | 2026-11-10  |
+|       3 | Vegetable Curry | Cooked Food   |      150 | 2026-10-02  |
+|       4 | Bread           | Bakery        |      100 | 2026-10-03  |
+|       5 | Fruits          | Fresh Food    |      200 | 2026-10-05  |
+|       6 | Dal             | Pulses        |      250 | 2026-12-01  |
+|       7 | Milk            | Dairy         |      120 | 2026-10-01  |
+|       8 | Biscuits        | Packaged Food |      180 | 2027-01-15  |
++---------+-----------------+---------------+----------+-------------+
+8 rows in set (0.01 sec)
+
+Query OK, 0 rows affected (0.03 sec)
+
+mysql>
+mysql>
+mysql> -- 32. Procedure to display donations by a specific donor
+mysql>
+mysql> DELIMITER //
+mysql>
+mysql> CREATE PROCEDURE GetDonorDonations(IN p_donor_id INT)
+    -> BEGIN
+    ->     SELECT donation_id,
+    ->            food_id,
+    ->            quantity_donated,
+    ->            donation_date
+    ->     FROM DONATIONS
+    ->     WHERE donor_id = p_donor_id;
+    -> END //
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>
+mysql> DELIMITER ;
+mysql>
+mysql> CALL GetDonorDonations(1);
++-------------+---------+------------------+---------------+
+| donation_id | food_id | quantity_donated | donation_date |
++-------------+---------+------------------+---------------+
+|           1 |       1 |              200 | 2026-09-20    |
+|           2 |       3 |              100 | 2026-09-21    |
++-------------+---------+------------------+---------------+
+2 rows in set (0.05 sec)
+
+Query OK, 0 rows affected (0.09 sec)
+
+mysql>
